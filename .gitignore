@@ -1,0 +1,19 @@
+# Environment folders
+venv/
+__pycache__/
+.idea/
+
+# Secrets
+.env
+
+# Data
+.sqlite
+
+# Tests
+.hypothesis/
+.pytest_cache/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+dmypy.json
