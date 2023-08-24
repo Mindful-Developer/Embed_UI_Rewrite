@@ -1,3 +1,4 @@
 disnake==2.9.0
 pony==0.7.16
 python-dotenv==1.0.0
+urllib3==2.0.4

@@ -26,6 +26,9 @@ class MbedField(db.Entity):
     mbed_field_inline = orm.Required(bool)
     mbed_field_mbed = orm.Required('Mbed')
 
+    @property
+    def size(self):
+        return len(self.mbed_field_name) + len(self.mbed_field_value)
 
 class EventType(db.Entity):
     event_type_id = orm.PrimaryKey(int, auto=True)
@@ -55,12 +58,10 @@ class Mbed(db.Entity):
         mbed_contributors = [self.mbed_title, self.mbed_description, self.mbed_author, self.mbed_footer]
 
         for contributor in mbed_contributors:
-            chars -= len(contributor) if contributor and contributor != '\u200b' else 0
+            chars -= len(contributor) if contributor else 0
 
         for field in self.mbed_fields:
-            chars -= len(field.mbed_field_name) if field.mbed_field_name and field.mbed_field_name != '\u200b' else 0
-            chars -= len(
-                field.mbed_field_value) if field.mbed_field_value and field.mbed_field_value != '\u200b' else 0
+            chars -= field.size
 
         return chars
 

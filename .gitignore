@@ -7,7 +7,7 @@ __pycache__/
 .env
 
 # Data
-.sqlite
+*.sqlite
 
 # Tests
 .hypothesis/
