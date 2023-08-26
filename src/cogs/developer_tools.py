@@ -1,7 +1,7 @@
 import os
 from disnake import ApplicationCommandInteraction
-from disnake.ext.commands import Cog, slash_command
-from utils.enums import Cogs
+from disnake.ext.commands import Cog, slash_command, InteractionBot
+from models.enums import Cogs
 from utils.register import register_cog
 from utils.time_functions import server_time_difference as time_diff
 
@@ -12,7 +12,7 @@ test_guilds = list(map(int, (os.environ.get('TEST_GUILDS') or '0').split(',')))
 @register_cog
 class DeveloperTools(Cog):
     def __init__(self, client):
-        self.client = client
+        self.client: InteractionBot = client
 
     async def cog_slash_command_check(self, inter: ApplicationCommandInteraction):
         """Only allow the owner of the bot to use the commands in this cog"""
@@ -31,7 +31,8 @@ class DeveloperTools(Cog):
     @slash_command(name='ping', description='Check the latency of the bot.', guild_ids=test_guilds)
     async def ping(self, inter: ApplicationCommandInteraction):
         """Pings the bot returning response delay"""
-        await inter.response.send_message(f'Statbot responded in {round(self.client.latency * 1000)}ms', ephemeral=True)
+        await inter.response.send_message(f'{self.client.user.name} responded in {round(self.client.latency * 1000)}ms',
+                                          ephemeral=True)
 
     @slash_command(name='timediff', description='Checks the local time of the bot.', guild_ids=test_guilds)
     async def time_diff(self, inter: ApplicationCommandInteraction):

@@ -1,9 +1,6 @@
-if __name__ == '__main__':
-    from dotenv import load_dotenv
-    load_dotenv()
-
-from models import EventType, orm
-from utils.enums import EventTypes
+from database.models import EventType, orm
+from models.enums import EventTypes
+import os
 
 
 @orm.db_session
@@ -16,5 +13,9 @@ def populate_event_types():
         EventType(event_type_name=event_type_name)
 
 
-if __name__ == '__main__':
+def setup_db():
+    if int(os.environ.get('DEV_MODE')):
+        orm.set_sql_debug(True)
+    else:
+        orm.set_sql_debug(False)
     populate_event_types()

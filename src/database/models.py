@@ -7,28 +7,29 @@ db = orm.Database()
 
 class Guild(db.Entity):
     guild_id = orm.PrimaryKey(int)
-    guild_mbeds = orm.Set('Mbed', cascade_delete=True)
+    guild_embeds = orm.Set('Embed', cascade_delete=True)
     guild_events = orm.Set('Event', cascade_delete=True)
 
 
 class User(db.Entity):
     user_id = orm.PrimaryKey(int)
     user_timezone = orm.Optional(str, nullable=True)
-    user_mbeds = orm.Set('Mbed', cascade_delete=True)
+    user_embeds = orm.Set('Embed', cascade_delete=True)
     user_events = orm.Set('Event', cascade_delete=True)
 
 
-class MbedField(db.Entity):
-    mbed_field_id = orm.PrimaryKey(int, auto=True)
-    mbed_field_position = orm.Required(int)
-    mbed_field_name = orm.Optional(str, 256, default='\u200b')
-    mbed_field_value = orm.Optional(str, 1024, default='\u200b')
-    mbed_field_inline = orm.Required(bool)
-    mbed_field_mbed = orm.Required('Mbed')
+class EmbedField(db.Entity):
+    embed_field_id = orm.PrimaryKey(int, auto=True)
+    embed_field_position = orm.Required(int)
+    embed_field_name = orm.Optional(str, 256, default='\u200b')
+    embed_field_value = orm.Optional(str, 1024, default='\u200b')
+    embed_field_inline = orm.Required(bool)
+    embed_field_embed = orm.Required('Embed')
 
     @property
     def size(self):
-        return len(self.mbed_field_name) + len(self.mbed_field_value)
+        return len(self.embed_field_name) + len(self.embed_field_value)
+
 
 class EventType(db.Entity):
     event_type_id = orm.PrimaryKey(int, auto=True)
@@ -36,34 +37,38 @@ class EventType(db.Entity):
     event_type_events = orm.Set('Event', cascade_delete=True)
 
 
-class Mbed(db.Entity):
-    mbed_id = orm.PrimaryKey(int, auto=True)
-    mbed_name = orm.Optional(str, nullable=True)
-    mbed_color = orm.Optional(str, nullable=True)
-    mbed_title = orm.Optional(str, 256, default='\u200b')
-    mbed_description = orm.Optional(str, 4096, default='\u200b')
-    mbed_footer = orm.Optional(str, 2048, nullable=True)
-    mbed_author = orm.Optional(str, 256, nullable=True)
-    mbed_author_url = orm.Optional(str, nullable=True)
-    mbed_thumbnail_url = orm.Optional(str, nullable=True)
-    mbed_image_url = orm.Optional(str, nullable=True)
-    mbed_footer_url = orm.Optional(str, nullable=True)
-    mbed_guild = orm.Optional(Guild)
-    mbed_user = orm.Optional(User)
-    mbed_fields = orm.Set(MbedField, cascade_delete=True)
+class Embed(db.Entity):
+    embed_id = orm.PrimaryKey(int, auto=True)
+    embed_name = orm.Optional(str, nullable=True)
+    embed_colour = orm.Optional(str, nullable=True)
+    embed_title = orm.Optional(str, 256, default='\u200b')
+    embed_description = orm.Optional(str, 4096, default='\u200b')
+    embed_footer = orm.Optional(str, 2048, nullable=True)
+    embed_author = orm.Optional(str, 256, nullable=True)
+    embed_author_url = orm.Optional(str, nullable=True)
+    embed_thumbnail_url = orm.Optional(str, nullable=True)
+    embed_image_url = orm.Optional(str, nullable=True)
+    embed_footer_url = orm.Optional(str, nullable=True)
+    embed_guild = orm.Optional(Guild)
+    embed_user = orm.Optional(User)
+    embed_fields = orm.Set(EmbedField, cascade_delete=True)
 
     @property
     def remaining_chars(self):
         chars = 6000
-        mbed_contributors = [self.mbed_title, self.mbed_description, self.mbed_author, self.mbed_footer]
+        embed_contributors = [self.embed_title, self.embed_description, self.embed_author, self.embed_footer]
 
-        for contributor in mbed_contributors:
+        for contributor in embed_contributors:
             chars -= len(contributor) if contributor else 0
 
-        for field in self.mbed_fields:
+        for field in self.embed_fields:
             chars -= field.size
 
         return chars
+
+    @property
+    def remaining_fields(self):
+        return 25 - len(self.embed_fields)
 
 
 class Event(db.Entity):
@@ -79,6 +84,3 @@ class Event(db.Entity):
 
 db.bind(provider='sqlite', filename='database.sqlite', create_db=True)
 db.generate_mapping(create_tables=True)
-
-if int(os.environ.get('DEV_MODE')):
-    orm.set_sql_debug(True)

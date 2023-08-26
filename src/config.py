@@ -1,10 +1,6 @@
 import os
 import disnake as ds
 from disnake.ext import commands
-from dotenv import load_dotenv
-
-
-load_dotenv()
 
 
 def get_config():
